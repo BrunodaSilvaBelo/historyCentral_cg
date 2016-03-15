@@ -31,7 +31,8 @@ set( SOURCE ${SOURCE}
   "${PROJECT_SOURCE_DIR}/src/cpp/shader.cpp"
   "${PROJECT_SOURCE_DIR}/src/cpp/vertex.cpp"
   "${PROJECT_SOURCE_DIR}/src/cpp/mesh.cpp"
-  "${PROJECT_SOURCE_DIR}/src/cpp/stb_image.c"
+  "${PROJECT_SOURCE_DIR}/src/cpp/texture.cpp"
+  "${PROJECT_SOURCE_DIR}/thirdparty/stb_image/stb_image.c"
   )
 
 set ( EXTRA_DIRS ${EXTRA_DIRS}
@@ -39,6 +40,7 @@ set ( EXTRA_DIRS ${EXTRA_DIRS}
   ${GLEW_INCLUDE_DIRS}
   ${OPENGL_INCLUDE_DIRS}
   ${GLM_INCLUDE_DIRS}
+  "thirdparty/stb_image"
   )
 
 set( EXTRA_LIB ${EXTRA_LIB}
@@ -60,17 +62,17 @@ add_executable( "${PROJECT_NAME}test" src/cpp/test.cpp )
 
 
 target_link_libraries( "${PROJECT_NAME}code" ${LIB_NAME} )
-target_link_libraries( "${PROJECT_NAME}test" ${LIB_NAME})
+target_link_libraries( "${PROJECT_NAME}test" ${LIB_NAME} )
 
 enable_testing()
 add_test( NAME RunTests COMMAND "${PROJECT_NAME}test" )
 
 find_package( Doxygen )
 if ( DOXYGEN_FOUND )
-configure_file( ${PROJECT_SOURCE_DIR}/Doxyfile ${PROJECT_BINARY_DIR}/Doxyfile @ONLY )
-add_custom_target( doc
-${DOXYGEN_EXECUTABLE} ${PROJECT_BINARY_DIR}/Doxyfile
-WORKING_DIRECTORY ${PROJECT_BINARY_DIR}/..
-COMMENT "Generating API documentation with Doxygen" VERBATIM
-)
+  configure_file( ${PROJECT_SOURCE_DIR}/Doxyfile ${PROJECT_BINARY_DIR}/Doxyfile @ONLY )
+  add_custom_target( doc
+    ${DOXYGEN_EXECUTABLE} ${PROJECT_BINARY_DIR}/Doxyfile
+    WORKING_DIRECTORY ${PROJECT_BINARY_DIR}/..
+    COMMENT "Generating API documentation with Doxygen" VERBATIM
+    )
 endif ( DOXYGEN_FOUND )

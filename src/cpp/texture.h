@@ -1,12 +1,18 @@
 #ifndef TEXTURE_H
 #define TEXTURE_H
 
+#include <GL/glew.h>
+#include <string>
+
 class Texture {
 public:
-  Texture();
+  Texture(const std::string &file);
   ~Texture();
 
+  void bind(unsigned unit);
+
 private:
+  GLuint texture;
 };
 
 

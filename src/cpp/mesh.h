@@ -2,18 +2,20 @@
 #define MESH_H
 
 #include <GL/glew.h>
+#include <utility>
 
 class Vertex;
 
 class Mesh {
 public:
-  Mesh(Vertex *vertices, GLsizei numVertices);
+  Mesh(std::pair<Vertex*, GLsizei> vertices);
   ~Mesh();
   void draw();
 
 private:
   enum {
     POSITION_VB,
+    TEXCOORD_VB,
 
     NUM_BUFFERS
   };

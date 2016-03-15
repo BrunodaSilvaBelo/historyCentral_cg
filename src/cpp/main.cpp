@@ -11,6 +11,7 @@
 #include "shader.h"
 #include "mesh.h"
 #include "vertex.h"
+#include "texture.h"
 
 void keyboard(GLFWwindow *window, int key, int scancode, int action, int mode);
 
@@ -19,20 +20,22 @@ int main() {
     Window::init("OpenGL", 800, 600);
 
     Vertex vertices[] = {
-      Vertex(glm::vec3(-0.5f, -0.5f, 0.f)),
-      Vertex(glm::vec3(0.f, 0.5f, 0.f)),
-      Vertex(glm::vec3(0.5f, -0.5f, 0.f))
+      Vertex(glm::vec3(-0.5f, -0.5f, 0.f), glm::vec2(0.f, 0.f)),
+      Vertex(glm::vec3(0.f, 0.5f, 0.f), glm::vec2(0.5f, 1.f)),
+      Vertex(glm::vec3(0.5f, -0.5f, 0.f), glm::vec2(1.f, 0.f))
     };
 
-    Mesh mesh(vertices, sizeof(vertices) / sizeof(vertices[0]));
 
+    Mesh mesh({vertices, sizeof(vertices) / sizeof(vertices[0])});
     Shader shader("../src/glsl/basicShader");
+    Texture texture("../res/textures/wall.jpg");
 
     while (!Window::isClosed()) {
       glfwPollEvents();
       Window::clear();
 
       shader.bind();
+      texture.bind(0);
       mesh.draw();
 
       Window::update();
