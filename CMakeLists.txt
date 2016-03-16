@@ -32,6 +32,7 @@ set( SOURCE ${SOURCE}
   "${PROJECT_SOURCE_DIR}/src/cpp/vertex.cpp"
   "${PROJECT_SOURCE_DIR}/src/cpp/mesh.cpp"
   "${PROJECT_SOURCE_DIR}/src/cpp/texture.cpp"
+  "${PROJECT_SOURCE_DIR}/src/cpp/transform.cpp"
   "${PROJECT_SOURCE_DIR}/thirdparty/stb_image/stb_image.c"
   )
 

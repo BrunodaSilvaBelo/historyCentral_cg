@@ -1,6 +1,7 @@
 #include "shader.h"
 #include <fstream>
 #include <stdio.h>
+#include "transform.h"
 
 using namespace std;
 
@@ -21,10 +22,14 @@ Shader::Shader(const string &file) {
   glBindAttribLocation(program, 1, "texCoord");
 
   glLinkProgram(program);
-  checkShaderError(program, GL_LINK_STATUS, true, "Error: Program linking failed:");
+  checkShaderError(program, GL_LINK_STATUS, true,
+                   "Error: Program linking failed:");
 
   glValidateProgram(program);
-  checkShaderError(program, GL_VALIDATE_STATUS, true, "Error: Program linking failed:");
+  checkShaderError(program, GL_VALIDATE_STATUS, true,
+                   "Error: Program linking failed:");
+
+  uniforms[TRANSFORM_U] = glGetUniformLocation(program, "transform");
 }
 
 Shader::~Shader() {
@@ -37,6 +42,11 @@ Shader::~Shader() {
 
 void Shader::bind() {
   glUseProgram(program);
+}
+
+void Shader::update(const Transform &transform) {
+  glm::mat4 model = transform.getModel();
+  glUniformMatrix4fv(uniforms[TRANSFORM_U], 1, GL_FALSE, &model[0][0]);
 }
 
 string loadShader(const string &file) {

@@ -12,6 +12,7 @@
 #include "mesh.h"
 #include "vertex.h"
 #include "texture.h"
+#include "transform.h"
 
 void keyboard(GLFWwindow *window, int key, int scancode, int action, int mode);
 
@@ -29,19 +30,23 @@ int main() {
     Mesh mesh({vertices, sizeof(vertices) / sizeof(vertices[0])});
     Shader shader("../src/glsl/basicShader");
     Texture texture("../res/textures/wall.jpg");
+    Transform transform;
 
+    float counter = 0.f;
     while (!Window::isClosed()) {
       glfwPollEvents();
       Window::clear();
-
+      transform.applyTranslate(glm::vec3(sinf(counter), 0.f, 0.f));
       shader.bind();
+      shader.update(transform);
       texture.bind(0);
       mesh.draw();
 
       Window::update();
+      counter += 0.1f;
     }
   } catch(const std::exception &e) {
-    fprintf(stderr, "Error: %s", e.what());
+    fprintf(stderr, "Error: %s\n", e.what());
   }
   Window::close();
 
