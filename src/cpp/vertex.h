@@ -13,6 +13,7 @@ public:
 private:
   glm::vec2 texCoord;
   glm::vec3 position;
+  glm::vec3 normal;
 };
 
 #endif /* VERTEX_H */

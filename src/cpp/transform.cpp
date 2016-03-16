@@ -19,7 +19,7 @@ glm::mat4 Transform::getModel() const {
 
   glm::mat4 sMatrix = glm::scale(scale);
 
-  return tMatrix * rotZMatrix * rotYMatrix * rotXMatrix *sMatrix;
+  return tMatrix * rotZMatrix * rotYMatrix * rotXMatrix * sMatrix;
 }
 
 void Transform::applyTranslate(const glm::vec3 &translate) {
@@ -27,9 +27,9 @@ void Transform::applyTranslate(const glm::vec3 &translate) {
 }
 
 void Transform::applyRotation(const glm::vec3 &rotation) {
-  this->rotation *= rotation;
+  this->rotation = rotation;
 }
 
 void Transform::applyScale(const glm::vec3 &scale) {
-  this->scale *= scale;
+  this->scale = scale;
 }

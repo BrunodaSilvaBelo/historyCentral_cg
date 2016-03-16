@@ -2,6 +2,8 @@
 #include <fstream>
 #include <stdio.h>
 #include "transform.h"
+#include "camera.h"
+#include <glm/gtc/type_ptr.hpp>
 
 using namespace std;
 
@@ -44,9 +46,9 @@ void Shader::bind() {
   glUseProgram(program);
 }
 
-void Shader::update(const Transform &transform) {
-  glm::mat4 model = transform.getModel();
-  glUniformMatrix4fv(uniforms[TRANSFORM_U], 1, GL_FALSE, &model[0][0]);
+void Shader::update(const Transform &transform, const Camera &camera) {
+  glUniformMatrix4fv(uniforms[TRANSFORM_U], 1, GL_FALSE,
+                     glm::value_ptr(transform.getModel()));
 }
 
 string loadShader(const string &file) {

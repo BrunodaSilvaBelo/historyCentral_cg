@@ -5,13 +5,14 @@
 #include <string>
 
 class Transform;
+class Camera;
 
 class Shader {
 public:
   Shader(const std::string &file);
   ~Shader();
   void bind();
-  void update(const Transform &transform);
+  void update(const Transform &transform, const Camera &camera);
 private:
   enum {
     TRANSFORM_U,

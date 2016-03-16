@@ -33,7 +33,9 @@ set( SOURCE ${SOURCE}
   "${PROJECT_SOURCE_DIR}/src/cpp/mesh.cpp"
   "${PROJECT_SOURCE_DIR}/src/cpp/texture.cpp"
   "${PROJECT_SOURCE_DIR}/src/cpp/transform.cpp"
+  "${PROJECT_SOURCE_DIR}/src/cpp/camera.cpp"
   "${PROJECT_SOURCE_DIR}/thirdparty/stb_image/stb_image.c"
+  "${PROJECT_SOURCE_DIR}/thirdparty/obj_loader/obj_loader.cpp"
   )
 
 set ( EXTRA_DIRS ${EXTRA_DIRS}
@@ -42,6 +44,8 @@ set ( EXTRA_DIRS ${EXTRA_DIRS}
   ${OPENGL_INCLUDE_DIRS}
   ${GLM_INCLUDE_DIRS}
   "thirdparty/stb_image"
+  "thirdparty/obj_loader"
+  "thirdparty/catch"
   )
 
 set( EXTRA_LIB ${EXTRA_LIB}
