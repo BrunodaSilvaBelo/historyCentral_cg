@@ -22,6 +22,7 @@ Shader::Shader(const string &file) {
 
   glBindAttribLocation(program, 0, "position");
   glBindAttribLocation(program, 1, "texCoord");
+  glBindAttribLocation(program, 2, "normal");
 
   glLinkProgram(program);
   checkShaderError(program, GL_LINK_STATUS, true,
@@ -31,7 +32,10 @@ Shader::Shader(const string &file) {
   checkShaderError(program, GL_VALIDATE_STATUS, true,
                    "Error: Program linking failed:");
 
-  uniforms[TRANSFORM_U] = glGetUniformLocation(program, "transform");
+  uniforms[TRANSFORM_U] = glGetUniformLocation(program, "MVP");
+  uniforms[NORMAL] = glGetUniformLocation(program, "Normal");
+  uniforms[LIGHT_DIRECTION] = glGetUniformLocation(program, "lightDirection");
+
 }
 
 Shader::~Shader() {
@@ -49,6 +53,9 @@ void Shader::bind() {
 void Shader::update(const Transform &transform, const Camera &camera) {
   glUniformMatrix4fv(uniforms[TRANSFORM_U], 1, GL_FALSE,
                      glm::value_ptr(transform.getModel()));
+  glUniformMatrix4fv(uniforms[NORMAL], 1, GL_FALSE,
+                     glm::value_ptr(camera.getViewProjection()));
+  glUniform3f(uniforms[LIGHT_DIRECTION], 0.f, 0.f, 0.f);
 }
 
 string loadShader(const string &file) {

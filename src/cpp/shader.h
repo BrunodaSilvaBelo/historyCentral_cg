@@ -16,7 +16,9 @@ public:
 private:
   enum {
     TRANSFORM_U,
-
+    NORMAL,
+    LIGHT_DIRECTION,
+    
     NUM_UNIFORMS
   };
   static const unsigned int NUM_SHADERS = 2;

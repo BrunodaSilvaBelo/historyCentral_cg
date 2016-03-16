@@ -40,19 +40,16 @@ int main() {
 
     Transform transform;
 
-    Camera camera(glm::vec3(0.f, 0.f, 3.f), 70.f, 800.f/600.f, 0.01f, 1000.f);
+    Camera camera(glm::vec3(0.f, 0.f, -5.f), 70.f, Window::aspect(), 0.1f, 100.f);
 
     float counter = 0.f;
     while (!Window::isClosed()) {
       glfwPollEvents();
       Window::clear();
-      float sin = sinf(counter);
-      float cos = cosf(counter);
-
       transform.applyRotation(glm::vec3(static_cast<GLfloat>(glfwGetTime()),
                                         static_cast<GLfloat>(glfwGetTime()),
                                         static_cast<GLfloat>(glfwGetTime())));
-      transform.applyScale(glm::vec3(0.5f, 0.5f, 0.5f));
+
       shader.update(transform, camera);
       mesh2.draw();
 
