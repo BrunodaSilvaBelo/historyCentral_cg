@@ -2,6 +2,7 @@
 #include "vertex.h"
 #include <vector>
 #include "obj_loader.h"
+#include <stdio.h>
 
 using namespace std;
 
@@ -55,6 +56,7 @@ void Mesh::initMesh(const IndexedModel &model) {
   glBindVertexArray(vertexArrayObject);
 
   glGenBuffers(NUM_BUFFERS, vertexArrayBuffers);
+
   glBindBuffer(GL_ARRAY_BUFFER, vertexArrayBuffers[POSITION_VB]);
   glBufferData(GL_ARRAY_BUFFER, model.positions.size()
                * sizeof(model.positions[0]), &model.positions[0], GL_STATIC_DRAW);

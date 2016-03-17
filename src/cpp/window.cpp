@@ -5,8 +5,10 @@ using namespace std;
 
 unique_ptr<GLFWwindow, function<void(GLFWwindow*)>> Window::window
 = unique_ptr<GLFWwindow, function<void(GLFWwindow*)>>(nullptr, glfwDestroyWindow);
-
 pair<int,int> Window::dimension = {0,0};
+GLfloat Window::currentTimer = 0.f;
+GLfloat Window::lastTimer = 0.f;
+GLfloat Window::deltaTimer = 0.f;
 
 void Window::init(const string &title, int width, int height) {
   glfwInit();
@@ -21,6 +23,8 @@ void Window::init(const string &title, int width, int height) {
     throw new runtime_error("GLFW window failed to be created!");
 
   glfwMakeContextCurrent(window.get());
+  glfwSetInputMode(window.get(), GLFW_STICKY_KEYS, 1);
+  glfwSetInputMode(window.get(), GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
   glewExperimental = GL_TRUE;
   if (glewInit() != GLEW_OK)
@@ -38,6 +42,12 @@ GLboolean Window::isClosed() {
 
 void Window::update() {
   glfwSwapBuffers(window.get());
+  currentTimer = static_cast<GLfloat>(glfwGetTime());
+  deltaTimer = currentTimer - lastTimer;
+  lastTimer = currentTimer;
+
+  if (getKey()(GLFW_KEY_ESCAPE) == GLFW_PRESS)
+    glfwSetWindowShouldClose(window.get(), GL_TRUE);
 }
 
 void Window::close() {
@@ -51,4 +61,17 @@ void Window::clear() {
 
 float Window::aspect() {
   return static_cast<float>(dimension.first)/static_cast<float>(dimension.second);
+}
+
+function<int(int)> Window::getKey() {
+  GLFWwindow *win = window.get();
+  return [win](int key){return glfwGetKey(win, key);};
+}
+
+void Window::startTimer() {
+  currentTimer = static_cast<GLfloat>(glfwGetTime());
+}
+
+GLfloat Window::deltaTime() {
+  return deltaTimer;
 }

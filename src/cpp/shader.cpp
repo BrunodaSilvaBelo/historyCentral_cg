@@ -12,6 +12,11 @@ void checkShaderError(GLuint shader, GLuint flag, GLboolean isProgram,
                       const string &errorMessage);
 GLuint createShader(const string &text, GLenum shaderType);
 
+const char *Shader::WORLD = "world";
+const char *Shader::PERSPECTIVE = "perspective";
+const char *Shader::CAMERA = "camera";
+const char *Shader::LIGHT_DIRECTION = "lightDirection";
+
 Shader::Shader(const string &file) {
   program = glCreateProgram();
   shaders[0] = createShader(loadShader(file + ".vs"), GL_VERTEX_SHADER);
@@ -32,9 +37,7 @@ Shader::Shader(const string &file) {
   checkShaderError(program, GL_VALIDATE_STATUS, true,
                    "Error: Program linking failed:");
 
-  uniforms[TRANSFORM_U] = glGetUniformLocation(program, "MVP");
-  uniforms[NORMAL] = glGetUniformLocation(program, "Normal");
-  uniforms[LIGHT_DIRECTION] = glGetUniformLocation(program, "lightDirection");
+
 
 }
 
@@ -48,14 +51,13 @@ Shader::~Shader() {
 
 void Shader::bind() {
   glUseProgram(program);
+  glUniform3f(glGetUniformLocation(program, LIGHT_DIRECTION), 0.f, 0.f, -3.f);
 }
 
-void Shader::update(const Transform &transform, const Camera &camera) {
-  glUniformMatrix4fv(uniforms[TRANSFORM_U], 1, GL_FALSE,
-                     glm::value_ptr(transform.getModel()));
-  glUniformMatrix4fv(uniforms[NORMAL], 1, GL_FALSE,
-                     glm::value_ptr(camera.getViewProjection()));
-  glUniform3f(uniforms[LIGHT_DIRECTION], 0.f, 0.f, 0.f);
+void Shader::update(const char *name, const glm::mat4 &matrix) {
+  glUniformMatrix4fv(glGetUniformLocation(program, name), 1, GL_FALSE,
+                     glm::value_ptr(matrix));
+
 }
 
 string loadShader(const string &file) {

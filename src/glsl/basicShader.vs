@@ -7,11 +7,12 @@ layout (location = 2) in vec3 normal;
 out vec2 texCoord0;
 out vec3 normal0;
 
-uniform mat4 MVP;
-uniform mat4 Normal;
+uniform mat4 world;
+uniform mat4 perspective;
+uniform mat4 camera;
 
 void main() {
-  gl_Position = Normal * MVP * vec4(position, 1.0);
+  gl_Position = perspective * camera * world * vec4(position, 1.0);
   texCoord0 = texCoord;
-  normal0 = (Normal * vec4(normal, 0.0)).xyz;
+  normal0 = (perspective * vec4(normal, 0.0)).xyz;
 }

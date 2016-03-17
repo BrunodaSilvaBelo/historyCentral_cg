@@ -16,8 +16,15 @@ public:
   static void close();
   static void clear();
   static float aspect();
+  static std::function<int(int)> getKey();
+  static void startTimer();
+  static GLfloat deltaTime();
+
 private:
   static constexpr GLint FPS = 1000 / 60;
+  static GLfloat currentTimer;
+  static GLfloat lastTimer;
+  static GLfloat deltaTimer;
   static std::pair<int, int> dimension;
   static std::unique_ptr<GLFWwindow, std::function<void(GLFWwindow*)>> window;
 };
