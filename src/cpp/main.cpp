@@ -58,7 +58,7 @@ int main() {
       shader.update(Shader::WORLD, transform.getModel());
       shader.update(Shader::CAMERA, camera.getCamera());
       mesh2.draw();
-      camera.update(Window::deltaTime(), Window::getKey());
+      camera.update(Window::deltaTime(), Window::getKey(), Window::getMousePosition());
       Window::update();
       counter += 0.01f;
     }

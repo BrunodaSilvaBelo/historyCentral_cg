@@ -3,9 +3,11 @@
 
 using namespace std;
 
+void mouse(GLFWwindow *window, double xpos, double ypos);
+
 unique_ptr<GLFWwindow, function<void(GLFWwindow*)>> Window::window
 = unique_ptr<GLFWwindow, function<void(GLFWwindow*)>>(nullptr, glfwDestroyWindow);
-pair<int,int> Window::dimension = {0,0};
+pair<GLsizei, GLsizei> Window::dimension = {0,0};
 GLfloat Window::currentTimer = 0.f;
 GLfloat Window::lastTimer = 0.f;
 GLfloat Window::deltaTimer = 0.f;
@@ -63,15 +65,20 @@ float Window::aspect() {
   return static_cast<float>(dimension.first)/static_cast<float>(dimension.second);
 }
 
-function<int(int)> Window::getKey() {
-  GLFWwindow *win = window.get();
-  return [win](int key){return glfwGetKey(win, key);};
-}
-
 void Window::startTimer() {
   currentTimer = static_cast<GLfloat>(glfwGetTime());
 }
 
 GLfloat Window::deltaTime() {
   return deltaTimer;
+}
+
+function<int(int)> Window::getKey() {
+  GLFWwindow *win = window.get();
+  return [win](int key){return glfwGetKey(win, key);};
+}
+
+function<void(double*,double*)> Window::getMousePosition() {
+  GLFWwindow *win = window.get();
+  return [win](double *xpos, double *ypos){return glfwGetCursorPos(win, xpos, ypos);};
 }
