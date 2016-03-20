@@ -12,6 +12,7 @@ public:
   void applyTranslate(const glm::vec3 &translate);
   void applyRotation(const glm::vec3 &rotation);
   void applyScale(const glm::vec3 &scale);
+  glm::vec3 getPosition() const;
 
 private:
   glm::vec3 translate;

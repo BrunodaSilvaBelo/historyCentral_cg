@@ -12,10 +12,9 @@ void checkShaderError(GLuint shader, GLuint flag, GLboolean isProgram,
                       const string &errorMessage);
 GLuint createShader(const string &text, GLenum shaderType);
 
-const char *Shader::WORLD = "world";
-const char *Shader::PERSPECTIVE = "perspective";
-const char *Shader::CAMERA = "camera";
-const char *Shader::LIGHT_DIRECTION = "lightDirection";
+const char *Shader::MODEL = "model";
+const char *Shader::PROJECTION = "projection";
+const char *Shader::VIEW = "view";
 
 Shader::Shader(const string &file) {
   program = glCreateProgram();
@@ -51,13 +50,16 @@ Shader::~Shader() {
 
 void Shader::bind() {
   glUseProgram(program);
-  glUniform3f(glGetUniformLocation(program, LIGHT_DIRECTION), 0.f, 0.f, -3.f);
 }
 
 void Shader::update(const char *name, const glm::mat4 &matrix) {
   glUniformMatrix4fv(glGetUniformLocation(program, name), 1, GL_FALSE,
                      glm::value_ptr(matrix));
 
+}
+
+void Shader::update(const char *name, const glm::vec3 &vector) {
+  glUniform3fv(glGetUniformLocation(program, name), 1, glm::value_ptr(vector));
 }
 
 string loadShader(const string &file) {

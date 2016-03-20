@@ -20,6 +20,7 @@ public:
   static GLfloat deltaTime();
   static std::function<int(int)> getKey();
   static std::function<void(double*,double*)> getMousePosition();
+  static std::function<int(int)> getMouseButton();
 
 private:
   static constexpr GLint FPS = 1000 / 60;

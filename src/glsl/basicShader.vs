@@ -4,15 +4,17 @@ layout (location = 0) in vec3 position;
 layout (location = 1) in vec2 texCoord;
 layout (location = 2) in vec3 normal;
 
-out vec2 texCoord0;
 out vec3 normal0;
+out vec2 texCoord0;
+out vec3 fragPosition;
 
-uniform mat4 world;
-uniform mat4 perspective;
-uniform mat4 camera;
+uniform mat4 model;
+uniform mat4 projection;
+uniform mat4 view;
 
 void main() {
-  gl_Position = perspective * camera * world * vec4(position, 1.0);
+  gl_Position = projection * view * model * vec4(position, 1.f);
+  fragPosition = vec3(model * vec4(position, 1.f));
+  normal0 = mat3(transpose(inverse(model))) * normal;
   texCoord0 = texCoord;
-  normal0 = (perspective * vec4(normal, 0.0)).xyz;
 }

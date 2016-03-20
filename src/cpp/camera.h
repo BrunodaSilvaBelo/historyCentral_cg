@@ -8,10 +8,12 @@
 class Camera {
 public:
   Camera(const glm::vec3 &position, float fov, float aspect, float near, float far);
-  glm::mat4 getCamera() const;
-  glm::mat4 getPerspective() const;
+  glm::mat4 getView() const;
+  glm::mat4 getProjection() const;
+  glm::vec3 getPosition() const;
   void update(GLfloat delta, const std::function<int(int)> &getKey,
-              const std::function<void(double*,double*)> &getMousePosition);
+              const std::function<void(double*,double*)> &getMousePosition,
+              const std::function<int(int)> &getMouseButton);
 
 private:
   GLfloat speed = 5.f;
@@ -21,7 +23,7 @@ private:
   glm::vec3 position;
   glm::vec3 forward;
   glm::vec3 up;
-  glm::mat4 perspective;
+  glm::mat4 projection;
 };
 
 

@@ -82,3 +82,8 @@ function<void(double*,double*)> Window::getMousePosition() {
   GLFWwindow *win = window.get();
   return [win](double *xpos, double *ypos){return glfwGetCursorPos(win, xpos, ypos);};
 }
+
+function<int(int)> Window::getMouseButton() {
+  GLFWwindow *win = window.get();
+  return [win](int button){return glfwGetMouseButton(win, button);};
+}

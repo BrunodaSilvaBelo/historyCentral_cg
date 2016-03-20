@@ -33,3 +33,7 @@ void Transform::applyRotation(const glm::vec3 &rotation) {
 void Transform::applyScale(const glm::vec3 &scale) {
   this->scale = scale;
 }
+
+glm::vec3 Transform::getPosition() const {
+  return translate;
+}
