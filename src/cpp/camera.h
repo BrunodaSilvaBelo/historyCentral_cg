@@ -14,6 +14,7 @@ public:
   void update(GLfloat delta, const std::function<int(int)> &getKey,
               const std::function<void(double*,double*)> &getMousePosition,
               const std::function<int(int)> &getMouseButton);
+  glm::vec3 getForward() const;
 
 private:
   GLfloat speed = 5.f;

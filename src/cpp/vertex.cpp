@@ -19,3 +19,11 @@ void Vertex::textures(vector<glm::vec2> &texCoords) const {
 void Vertex::normals(vector<glm::vec3> &normals) const {
   normals.push_back(normal);
 }
+
+void Vertex::addNormal(const glm::vec3 &normal) {
+  this->normal += normal;
+}
+
+glm::vec3 Vertex::operator-(const Vertex &rhs) const {
+  return position - rhs.position;
+}

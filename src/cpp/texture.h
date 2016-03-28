@@ -3,16 +3,20 @@
 
 #include <GL/glew.h>
 #include <string>
+#include <vector>
 
 class Texture {
 public:
+  Texture() = default;
   Texture(const std::string &file);
   ~Texture();
 
-  void bind(unsigned unit);
+  void add(const std::string &file);
+  void bind() const;
 
 private:
-  GLuint texture;
+  unsigned count = 0;
+  std::vector<GLuint> textures;
 };
 
 

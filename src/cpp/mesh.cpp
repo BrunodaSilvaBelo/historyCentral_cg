@@ -3,33 +3,51 @@
 #include <vector>
 #include "obj_loader.h"
 #include <stdio.h>
+#include <stb_image.h>
 
 using namespace std;
 
-Mesh::Mesh(pair<Vertex*, GLsizei> vertices, pair<unsigned*, GLsizei> indices) {
+Mesh::Mesh(vector<Vertex> vertices, vector<unsigned> indices, bool hasNormal) {
+
+  if (!hasNormal) {
+    for (unsigned i = 0; i < indices.size(); i += 3) {
+      auto i0 = indices[i];
+      auto i1 = indices[i+1];
+      auto i2 = indices[i+2];
+
+      auto v1 = vertices[i1] - vertices[i0];
+      auto v2 = vertices[i2] - vertices[i0];
+      auto normal = glm::cross(v1, v2);
+
+      vertices[i0].addNormal(normal);
+      vertices[i1].addNormal(normal);
+      vertices[i2].addNormal(normal);
+    }
+  }
+
   vector<glm::vec3> positions;
-  positions.reserve(static_cast<unsigned>(vertices.second));
+  positions.reserve(static_cast<unsigned>(vertices.size()));
 
   vector<glm::vec2> texCoords;
-  texCoords.reserve(static_cast<unsigned>(vertices.second));
+  texCoords.reserve(static_cast<unsigned>(vertices.size()));
 
   vector<glm::vec3> normals;
-  normals.reserve(static_cast<unsigned>(vertices.second));
+  normals.reserve(static_cast<unsigned>(vertices.size()));
 
   IndexedModel model;
 
-  for (GLsizei i = 0; i < vertices.second; ++i) {
-    vertices.first[i].positions(positions);
-    vertices.first[i].textures(texCoords);
-    vertices.first[i].normals(normals);
+  for (auto &i : vertices) {
+    i.positions(positions);
+    i.textures(texCoords);
+    i.normals(normals);
   }
 
   model.positions = positions;
   model.texCoords = texCoords;
   model.normals = normals;
 
-  for (GLsizei i = 0; i < indices.second; ++i)
-    model.indices.push_back(indices.first[i]);
+  for (auto &i : indices)
+    model.indices.push_back(i);
 
   initMesh(model);
 }
@@ -43,10 +61,66 @@ Mesh::~Mesh() {
   glDeleteVertexArrays(1, &vertexArrayObject);
 }
 
-void Mesh::draw() {
+void Mesh::draw() const {
   glBindVertexArray(vertexArrayObject);
   glDrawElements(GL_TRIANGLES, counter, GL_UNSIGNED_INT, 0);
   glBindVertexArray(0);
+}
+
+Mesh Mesh::getPlainTerrain(unsigned size, float width) {
+  vector<Vertex> vertices;
+  vector<unsigned> indices;
+  for (unsigned z = 0; z < size; ++z)
+    for (unsigned x = 0; x < size; ++x)
+      vertices.push_back(Vertex(glm::vec3(x*width, 0, z*width),
+                                glm::vec2(x%2, z%2)));
+
+  for (unsigned z = 0; z < size - 1; ++z)
+    for (unsigned x = 0; x < size - 1; ++x) {
+      indices.push_back(z  * size + x);
+      indices.push_back((z + 1)  * size + x);
+      indices.push_back((z + 1) * size + (x + 1));
+      indices.push_back((z + 1) * size + (x + 1));
+      indices.push_back(z * size + (x + 1));
+      indices.push_back(z  * size + x);
+    }
+  
+  return Mesh(vertices, indices);
+}
+
+Mesh Mesh::getHeightTerrain(float width, const string &file,
+                            float maxHeight) {
+  GLsizei filewidth, fileheight, numComponents;
+  unsigned char *grey = stbi_load(file.c_str(), &filewidth, &fileheight, &numComponents, 1);
+  if (!grey)
+    printf("Error on read height map: %s\n", file.c_str());
+
+
+  for (unsigned i = 0; i < filewidth * fileheight; ++i)
+    printf("%d\n", grey[i]);
+  printf("%d %d\n", filewidth, fileheight);
+  vector<Vertex> vertices;
+  vector<unsigned> indices;
+  for (unsigned z = 0; z < fileheight; ++z)
+    for (unsigned x = 0; x < filewidth; ++x)
+      vertices.push_back(Vertex(glm::vec3(x*width,
+                                          (static_cast<float>(grey[z*fileheight+x])/255.f)
+                                          * maxHeight,
+                                          z*width),
+                                glm::vec2(x%2, z%2)));
+
+  for (unsigned z = 0; z < fileheight - 1; ++z)
+    for (unsigned x = 0; x < filewidth - 1; ++x) {
+      indices.push_back(z  * fileheight + x);
+      indices.push_back((z + 1)  * fileheight + x);
+      indices.push_back((z + 1) * fileheight + (x + 1));
+      indices.push_back((z + 1) * fileheight + (x + 1));
+      indices.push_back(z * fileheight + (x + 1));
+      indices.push_back(z  * fileheight + x);
+    }
+  stbi_image_free(grey);
+  
+  return Mesh(vertices, indices);
 }
 
 void Mesh::initMesh(const IndexedModel &model) {

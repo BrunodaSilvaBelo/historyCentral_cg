@@ -34,6 +34,11 @@ set( SOURCE ${SOURCE}
   "${PROJECT_SOURCE_DIR}/src/cpp/texture.cpp"
   "${PROJECT_SOURCE_DIR}/src/cpp/transform.cpp"
   "${PROJECT_SOURCE_DIR}/src/cpp/camera.cpp"
+  "${PROJECT_SOURCE_DIR}/src/cpp/entity.cpp"
+  "${PROJECT_SOURCE_DIR}/src/cpp/baseLight.cpp"
+  "${PROJECT_SOURCE_DIR}/src/cpp/directionalLight.cpp"
+  "${PROJECT_SOURCE_DIR}/src/cpp/pointLight.cpp"
+  "${PROJECT_SOURCE_DIR}/src/cpp/spotLight.cpp"
   "${PROJECT_SOURCE_DIR}/thirdparty/stb_image/stb_image.c"
   "${PROJECT_SOURCE_DIR}/thirdparty/obj_loader/obj_loader.cpp"
   )

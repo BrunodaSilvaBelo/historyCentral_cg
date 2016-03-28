@@ -2,20 +2,22 @@
 #define MESH_H
 
 #include <GL/glew.h>
-#include <utility>
 #include <string>
+#include <vector>
 
 class Vertex;
 class IndexedModel;
 
 class Mesh {
 public:
-  Mesh(std::pair<Vertex*, GLsizei> vertices,
-       std::pair<unsigned*, GLsizei> indices);
+  Mesh(std::vector<Vertex> vertices, std::vector<unsigned> indices, bool hasNormal = true);
   Mesh(const std::string &file);
   ~Mesh();
-  void draw();
+  void draw() const;
 
+  static Mesh getPlainTerrain(unsigned size, float width);
+  static Mesh getHeightTerrain(float width, const std::string &file,
+                               float maxHeight);
 private:
   enum {
     POSITION_VB,

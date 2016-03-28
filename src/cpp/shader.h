@@ -18,6 +18,8 @@ public:
   void bind();
   void update(const char *name, const glm::mat4 &matrix);
   void update(const char *name, const glm::vec3 &vector);
+  void update(const char *name, const GLfloat value);
+  void update(const char *name, const GLint value);
 private:
   static const unsigned int NUM_SHADERS = 2;
   GLuint program;
