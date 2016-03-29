@@ -136,6 +136,8 @@ int main() {
 
       counter += 0.01f;
     }
+    //printf("Directional\n%s\nPoint\n%s\nSpot\n%s\n", dLight.to_string().c_str(), pLight.to_string().c_str(),
+    //       sLight.to_string().c_str());
   } catch(const std::exception &e) {
     fprintf(stderr, "Error: %s\n", e.what());
   }

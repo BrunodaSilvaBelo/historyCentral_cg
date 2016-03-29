@@ -39,6 +39,7 @@ set( SOURCE ${SOURCE}
   "${PROJECT_SOURCE_DIR}/src/cpp/directionalLight.cpp"
   "${PROJECT_SOURCE_DIR}/src/cpp/pointLight.cpp"
   "${PROJECT_SOURCE_DIR}/src/cpp/spotLight.cpp"
+  "${PROJECT_SOURCE_DIR}/src/cpp/attenuation.cpp"
   "${PROJECT_SOURCE_DIR}/thirdparty/stb_image/stb_image.c"
   "${PROJECT_SOURCE_DIR}/thirdparty/obj_loader/obj_loader.cpp"
   )

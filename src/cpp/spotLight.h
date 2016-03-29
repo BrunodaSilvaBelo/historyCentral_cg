@@ -2,12 +2,12 @@
 #define SPOTLIGHT_H
 
 #include <GL/glew.h>
-#include "baseLight.h"
 #include <glm/glm.hpp>
+#include "pointLight.h"
 
 class Shader;
 
-class SpotLight : public BaseLight {
+class SpotLight {
 public:
   SpotLight(const glm::vec3 &position, const glm::vec3 &direction,
             GLboolean isOn = GL_TRUE,
@@ -27,15 +27,13 @@ public:
   virtual void bind(Shader &shader) const;
   void update(const glm::vec3 &vec, Type  type);
   void switchLight();
+  std::string to_string() const;
 private:
   GLboolean isOn;
   GLfloat cutOff;
   GLfloat outerCutOff;
-  GLfloat constant;
-  GLfloat linear;
-  GLfloat quadratic;
-  glm::vec3 position;
   glm::vec3 direction;
+  PointLight base;
 };
 
 #endif /* SPOTLIGHT_H */
