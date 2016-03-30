@@ -6,10 +6,10 @@ using namespace std;
 
 int PointLight::counter = 0;
 
-PointLight::PointLight(const glm::vec3 &position, const glm::vec3 &ambient,
-                       const glm::vec3 &diffuse, const glm::vec3 &specular,
-                       GLfloat constant, GLfloat linear, GLfloat quadratic,
-                       GLboolean isPoint)
+PointLight::PointLight(const glm::vec3 &position, GLfloat constant,
+                       GLfloat linear, GLfloat quadratic, GLboolean isPoint,
+                       const glm::vec3 &ambient, const glm::vec3 &diffuse,
+                       const glm::vec3 &specular)
   : index(counter)
   , position(position)
   , attenuation(constant, linear, quadratic)

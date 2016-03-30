@@ -13,8 +13,8 @@ SpotLight::SpotLight(const glm::vec3 &position, const glm::vec3 &direction,
   , cutOff(cutOff)
   , outerCutOff(outerCutOff)
   , direction(direction)
-  , base(position, ambient, diffuse, specular, constant, linear, quadratic,
-         GL_FALSE) {}
+  , base(position, constant, linear, quadratic,
+         GL_FALSE, ambient, diffuse, specular) {}
 
 void SpotLight::init(Shader &shader) const {
   string name = "spotLight";
