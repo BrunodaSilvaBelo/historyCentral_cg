@@ -119,7 +119,7 @@ void main() {
     result += calcPointLight(pointLight[i], normal);
 
   if (spotLight.isOn)
-    result += calcSpotLight(spotLight, normal);
+    result = calcSpotLight(spotLight, normal);
 
   color = vec4(result, 1.f);
 }

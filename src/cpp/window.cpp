@@ -25,7 +25,7 @@ void Window::init(const string &title, int width, int height) {
     throw new runtime_error("GLFW window failed to be created!");
 
   glfwMakeContextCurrent(window.get());
-  glfwSetInputMode(window.get(), GLFW_STICKY_KEYS, 1);
+  //glfwSetInputMode(window.get(), GLFW_STICKY_KEYS, 1);
   glfwSetInputMode(window.get(), GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
   glewExperimental = GL_TRUE;
