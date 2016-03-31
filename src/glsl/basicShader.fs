@@ -65,14 +65,16 @@ vec3 calcBaseLight(BaseLight light, vec3 lightDirection, vec3 normal) {
 
   float diff = dot(normal, -lightDirection);
   if (diff > 0) {
-    diffuse = diff * (light.diffuse * vec3(texture(material.diffuse, texCoord0)));
+    diffuse = diff * (light.diffuse
+                      * vec3(texture(material.diffuse, texCoord0)));
 
     vec3 viewDirection = normalize(viewPosition - fragPosition);
     vec3 reflectDirection = normalize(reflect(lightDirection, normal));
     float spec = dot(viewDirection, reflectDirection);
     if (spec > 0) {
       spec = pow(spec, material.shininess);
-      specular = spec * (light.specular * vec3(texture(material.specular, texCoord0)));
+      specular = spec * (light.specular
+                         * vec3(texture(material.specular, texCoord0)));
     }
   }
 
@@ -113,7 +115,9 @@ vec3 calcSpotLight(SpotLight light, vec3 normal) {
 void main() {
   vec3 normal = normalize(normal0);
 
-  vec3 result = calcDirectionalLight(directionalLight, normal);
+  vec3 result = vec3(0.f);
+
+  result += calcDirectionalLight(directionalLight, normal);
 
   for (int i = 0; i < numPointLight; ++i)
     result += calcPointLight(pointLight[i], normal);

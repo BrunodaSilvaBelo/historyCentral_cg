@@ -32,7 +32,7 @@ int main() {
     Shader shader("../src/glsl/basicShader");
     Camera camera(glm::vec3(0.f, 0.f, 3.f), 70.f, Window::aspect(), 0.1f, 100.f);
 
-    DirectionalLight dLight({1.f,1.f,1.f}, {0.f, 0.f, 0.f}, {0.f, 0.f, 0.f}, {0.f, 0.f, 0.f});
+    DirectionalLight dLight({0.f,0.f,0.f});
     dLight.init(shader);
     PointLight pLight({0.f,0.f,0.f}, 1.f, 0.f, 0.f);
     pLight.init(shader);
@@ -58,21 +58,24 @@ int main() {
 
       // sol
       planet.applyScale(glm::vec3(5.f));
-      planet.applyRotation({0.f, counter, 0.f});
+      planet.applyRotation({0.f, counter/0.5f, 0.f});
       planet.applyTranslate({0.f,0.f,0.f});
       planet.draw(shader, camera);
 
       // primeiro planeta
-      planet.applyScale(glm::vec3(1.f));
+      planet.applyScale(glm::vec3(0.8f));
+      planet.applyRotation({0.f, -counter * 3, 0.f});
       planet.applyTranslate({sin(counter) * 10, 0.f, cos(counter) * 10});
       planet.draw(shader, camera);
 
       // segundo planeta
+      planet.applyScale(glm::vec3(1.f));
       planet.applyTranslate({-sin(counter*1.5f) * 20, 0.f, cos(counter*1.5f) * 20});
-      planet.draw(shader, camera);
-      planet.applyScale(glm::vec3(0.2f));
+      planet.applyRotation({0.f, counter * 5, 0.f});
 
       // luas
+      planet.draw(shader, camera);
+      planet.applyScale(glm::vec3(0.2f));
       auto moonPosition = planet.getPosition();
       planet.applyTranslate(glm::vec3(-sin(counter*3) * 2, 0.f, cos(counter*3) * 2)
                             + moonPosition);
