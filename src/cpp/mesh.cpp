@@ -15,13 +15,13 @@ Mesh::Mesh(vector<Vertex> vertices, vector<unsigned> indices, bool hasNormal) {
       auto i1 = indices[i+1];
       auto i2 = indices[i+2];
 
-      auto v1 = vertices[i1] - vertices[i0];
-      auto v2 = vertices[i2] - vertices[i0];
+      auto v1 = vertices[i1].position - vertices[i0].position;
+      auto v2 = vertices[i2].position - vertices[i0].position;
       auto normal = glm::cross(v1, v2);
 
-      vertices[i0].addNormal(normal);
-      vertices[i1].addNormal(normal);
-      vertices[i2].addNormal(normal);
+      vertices[i0].normal += normal;
+      vertices[i1].normal += normal;
+      vertices[i2].normal += normal;
     }
   }
 
@@ -37,9 +37,9 @@ Mesh::Mesh(vector<Vertex> vertices, vector<unsigned> indices, bool hasNormal) {
   IndexedModel model;
 
   for (auto &i : vertices) {
-    i.positions(positions);
-    i.textures(texCoords);
-    i.normals(normals);
+    positions.push_back(i.position);
+    texCoords.push_back(i.texCoord);
+    normals.push_back(i.normal);
   }
 
   model.positions = positions;
@@ -84,7 +84,7 @@ Mesh Mesh::getPlainTerrain(unsigned size, float width) {
       indices.push_back(z * size + (x + 1));
       indices.push_back(z  * size + x);
     }
-  
+
   return Mesh(vertices, indices);
 }
 
@@ -119,7 +119,7 @@ Mesh Mesh::getHeightTerrain(float width, const string &file,
       indices.push_back(z  * fileheight + x);
     }
   stbi_image_free(grey);
-  
+
   return Mesh(vertices, indices);
 }
 

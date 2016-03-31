@@ -16,7 +16,7 @@
 #include "transform.h"
 #include "camera.h"
 #include <vector>
-#include "entity.h"
+#include "texturedEntity.h"
 #include <glm/gtx/string_cast.hpp>
 #include "directionalLight.h"
 #include "pointLight.h"
@@ -37,7 +37,7 @@ int main() {
     PointLight pLight({0.f,0.f,0.f}, 1.f, 0.f, 0.f);
     pLight.init(shader);
     Transform transform;
-    Entity planet(transform, mesh, "../res/textures/container2.png");
+    TexturedEntity planet(transform, mesh, "../res/textures/planet.png");
     planet.addTexture("../res/textures/container2_specular.png");
 
     shader.bind();
