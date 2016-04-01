@@ -1,8 +1,8 @@
 #version 330 core
 
 struct Material {
-  sampler2D diffuse;
-  sampler2D specular;
+  sampler2D texture_diffuse1;
+  sampler2D texture_specular1;
   float shininess;
 };
 
@@ -59,14 +59,14 @@ vec3 calcPointLight(PointLight light, vec3 normal);
 vec3 calcSpotLight(SpotLight light, vec3 normal);
 
 vec3 calcBaseLight(BaseLight light, vec3 lightDirection, vec3 normal) {
-  vec3 ambient = light.ambient * vec3(texture(material.diffuse, texCoord0));
+  vec3 ambient = light.ambient * vec3(texture(material.texture_diffuse1, texCoord0));
   vec3 diffuse = vec3(0.f);
   vec3 specular = vec3(0.f);
 
   float diff = dot(normal, -lightDirection);
   if (diff > 0) {
     diffuse = diff * (light.diffuse
-                      * vec3(texture(material.diffuse, texCoord0)));
+                      * vec3(texture(material.texture_diffuse1, texCoord0)));
 
     vec3 viewDirection = normalize(viewPosition - fragPosition);
     vec3 reflectDirection = normalize(reflect(lightDirection, normal));
@@ -74,7 +74,7 @@ vec3 calcBaseLight(BaseLight light, vec3 lightDirection, vec3 normal) {
     if (spec > 0) {
       spec = pow(spec, material.shininess);
       specular = spec * (light.specular
-                         * vec3(texture(material.specular, texCoord0)));
+                         * vec3(texture(material.texture_specular1, texCoord0)));
     }
   }
 

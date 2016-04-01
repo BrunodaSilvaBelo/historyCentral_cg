@@ -1,159 +1,72 @@
 #include "mesh.h"
-#include "vertex.h"
-#include <vector>
-#include "obj_loader.h"
-#include <stdio.h>
-#include <stb_image.h>
+#include "shader.h"
 
 using namespace std;
 
-Mesh::Mesh(vector<Vertex> vertices, vector<unsigned> indices, bool hasNormal) {
-
-  if (!hasNormal) {
-    for (unsigned i = 0; i < indices.size(); i += 3) {
-      auto i0 = indices[i];
-      auto i1 = indices[i+1];
-      auto i2 = indices[i+2];
-
-      auto v1 = vertices[i1].position - vertices[i0].position;
-      auto v2 = vertices[i2].position - vertices[i0].position;
-      auto normal = glm::cross(v1, v2);
-
-      vertices[i0].normal += normal;
-      vertices[i1].normal += normal;
-      vertices[i2].normal += normal;
-    }
-  }
-
-  vector<glm::vec3> positions;
-  positions.reserve(static_cast<unsigned>(vertices.size()));
-
-  vector<glm::vec2> texCoords;
-  texCoords.reserve(static_cast<unsigned>(vertices.size()));
-
-  vector<glm::vec3> normals;
-  normals.reserve(static_cast<unsigned>(vertices.size()));
-
-  IndexedModel model;
-
-  for (auto &i : vertices) {
-    positions.push_back(i.position);
-    texCoords.push_back(i.texCoord);
-    normals.push_back(i.normal);
-  }
-
-  model.positions = positions;
-  model.texCoords = texCoords;
-  model.normals = normals;
-
-  for (auto &i : indices)
-    model.indices.push_back(i);
-
-  initMesh(model);
+Mesh::Mesh(const vector<Vertex> &vertices, const vector<GLuint> &indices,
+           const vector<Texture> &textures)
+  : vertices(vertices)
+  , indices(indices)
+  , textures(textures) {
+  setupMesh();
 }
 
-Mesh::Mesh(const string &file) {
-  IndexedModel model = OBJModel(file).ToIndexedModel();
-  initMesh(model);
-}
+void Mesh::setupMesh() {
+  glGenVertexArrays(1, &vao);
+  glGenBuffers(1, &vbo);
+  glGenBuffers(1, &ebo);
 
-Mesh::~Mesh() {
-  glDeleteVertexArrays(1, &vertexArrayObject);
-}
+  glBindVertexArray(vao);
+  glBindBuffer(GL_ARRAY_BUFFER, vbo);
+  glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(Vertex), &vertices[0],
+               GL_STATIC_DRAW);
 
-void Mesh::draw() const {
-  glBindVertexArray(vertexArrayObject);
-  glDrawElements(GL_TRIANGLES, counter, GL_UNSIGNED_INT, 0);
-  glBindVertexArray(0);
-}
+  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
+  glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(GLuint),
+               &indices[0], GL_STATIC_DRAW);
 
-Mesh Mesh::getPlainTerrain(unsigned size, float width) {
-  vector<Vertex> vertices;
-  vector<unsigned> indices;
-  for (unsigned z = 0; z < size; ++z)
-    for (unsigned x = 0; x < size; ++x)
-      vertices.push_back(Vertex(glm::vec3(x*width, 0, z*width),
-                                glm::vec2(x%2, z%2)));
-
-  for (unsigned z = 0; z < size - 1; ++z)
-    for (unsigned x = 0; x < size - 1; ++x) {
-      indices.push_back(z  * size + x);
-      indices.push_back((z + 1)  * size + x);
-      indices.push_back((z + 1) * size + (x + 1));
-      indices.push_back((z + 1) * size + (x + 1));
-      indices.push_back(z * size + (x + 1));
-      indices.push_back(z  * size + x);
-    }
-
-  return Mesh(vertices, indices);
-}
-
-Mesh Mesh::getHeightTerrain(float width, const string &file,
-                            float maxHeight) {
-  GLsizei filewidth, fileheight, numComponents;
-  unsigned char *grey = stbi_load(file.c_str(), &filewidth, &fileheight, &numComponents, 1);
-  if (!grey)
-    printf("Error on read height map: %s\n", file.c_str());
-
-
-  for (unsigned i = 0; i < filewidth * fileheight; ++i)
-    printf("%d\n", grey[i]);
-  printf("%d %d\n", filewidth, fileheight);
-  vector<Vertex> vertices;
-  vector<unsigned> indices;
-  for (unsigned z = 0; z < fileheight; ++z)
-    for (unsigned x = 0; x < filewidth; ++x)
-      vertices.push_back(Vertex(glm::vec3(x*width,
-                                          (static_cast<float>(grey[z*fileheight+x])/255.f)
-                                          * maxHeight,
-                                          z*width),
-                                glm::vec2(x%2, z%2)));
-
-  for (unsigned z = 0; z < fileheight - 1; ++z)
-    for (unsigned x = 0; x < filewidth - 1; ++x) {
-      indices.push_back(z  * fileheight + x);
-      indices.push_back((z + 1)  * fileheight + x);
-      indices.push_back((z + 1) * fileheight + (x + 1));
-      indices.push_back((z + 1) * fileheight + (x + 1));
-      indices.push_back(z * fileheight + (x + 1));
-      indices.push_back(z  * fileheight + x);
-    }
-  stbi_image_free(grey);
-
-  return Mesh(vertices, indices);
-}
-
-void Mesh::initMesh(const IndexedModel &model) {
-  counter = static_cast<GLsizei>(model.indices.size());
-
-  glGenVertexArrays(1, &vertexArrayObject);
-  glBindVertexArray(vertexArrayObject);
-
-  glGenBuffers(NUM_BUFFERS, vertexArrayBuffers);
-
-  glBindBuffer(GL_ARRAY_BUFFER, vertexArrayBuffers[POSITION_VB]);
-  glBufferData(GL_ARRAY_BUFFER, model.positions.size()
-               * sizeof(model.positions[0]), &model.positions[0], GL_STATIC_DRAW);
-
+  // Position
   glEnableVertexAttribArray(0);
-  glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, 0);
+  glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), nullptr);
 
-  glBindBuffer(GL_ARRAY_BUFFER, vertexArrayBuffers[TEXCOORD_VB]);
-  glBufferData(GL_ARRAY_BUFFER, model.positions.size()
-               * sizeof(model.texCoords[0]), &model.texCoords[0], GL_STATIC_DRAW);
-
+  // TexCoord
   glEnableVertexAttribArray(1);
-  glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 0, 0);
+  glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex),
+                        (GLvoid*)(offsetof(Vertex, texCoord)));
 
-  glBindBuffer(GL_ARRAY_BUFFER, vertexArrayBuffers[NORMAL_VB]);
-  glBufferData(GL_ARRAY_BUFFER, model.normals.size()
-               * sizeof(model.normals[0]), &model.normals[0], GL_STATIC_DRAW);
-
+  // Normal
   glEnableVertexAttribArray(2);
-  glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, 0, 0);
+  glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex),
+                        (GLvoid*)(offsetof(Vertex, normal)));
 
-  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, vertexArrayBuffers[INDEX_VB]);
-  glBufferData(GL_ELEMENT_ARRAY_BUFFER, model.indices.size()
-               * sizeof(model.indices[0]), &model.indices[0], GL_STATIC_DRAW);
+
+
   glBindVertexArray(0);
+}
+
+
+void Mesh::draw(Shader &shader) {
+  GLuint diffuse = 1;
+  GLuint specular = 1;
+  for (GLuint i = 0; i < textures.size(); ++i) {
+    glActiveTexture(GL_TEXTURE0 + i);
+
+    string name = textures[i].type;
+    if (name.compare(Texture::DIFFUSE) == 0)
+      name += to_string(diffuse++);
+    else if (name.compare(Texture::SPECULAR) == 0)
+      name += to_string(specular++);
+
+    shader.update(("material." + name).c_str(), i);
+    glBindTexture(GL_TEXTURE_2D, textures[i].id);
+  }
+
+  glBindVertexArray(vao);
+  glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0);
+  glBindVertexArray(0);
+
+  for (GLuint i = 0; i < textures.size(); ++i) {
+    glActiveTexture(GL_TEXTURE0 + i);
+    glBindTexture(GL_TEXTURE_2D, 0);
+  }
 }

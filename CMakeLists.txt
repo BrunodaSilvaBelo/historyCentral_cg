@@ -6,6 +6,8 @@ find_package( GLEW REQUIRED )
 find_package( OpenGL REQUIRED )
 find_package( GLM REQUIRED )
 find_package( PkgConfig REQUIRED )
+find_package( Assimp REQUIRED )
+find_package( SOIL REQUIRED )
 pkg_search_module( GLFW REQUIRED glfw3 )
 
 if ( ${CMAKE_CXX_COMPILER_ID} STREQUAL "GNU" OR ${CMAKE_CXX_COMPILER_ID} STREQUAL "Clang" )
@@ -34,25 +36,25 @@ set( SOURCE ${SOURCE}
   "${PROJECT_SOURCE_DIR}/src/cpp/texture.cpp"
   "${PROJECT_SOURCE_DIR}/src/cpp/transform.cpp"
   "${PROJECT_SOURCE_DIR}/src/cpp/camera.cpp"
-  "${PROJECT_SOURCE_DIR}/src/cpp/texturedEntity.cpp"
-  "${PROJECT_SOURCE_DIR}/src/cpp/rawEntity.cpp"
+  "${PROJECT_SOURCE_DIR}/src/cpp/model.cpp"
   "${PROJECT_SOURCE_DIR}/src/cpp/baseLight.cpp"
   "${PROJECT_SOURCE_DIR}/src/cpp/directionalLight.cpp"
   "${PROJECT_SOURCE_DIR}/src/cpp/pointLight.cpp"
   "${PROJECT_SOURCE_DIR}/src/cpp/spotLight.cpp"
   "${PROJECT_SOURCE_DIR}/src/cpp/attenuation.cpp"
   "${PROJECT_SOURCE_DIR}/thirdparty/stb_image/stb_image.c"
-  "${PROJECT_SOURCE_DIR}/thirdparty/obj_loader/obj_loader.cpp"
   )
 
 set ( EXTRA_DIRS ${EXTRA_DIRS}
+  src/cpp
+  "thirdparty/catch"
+  "thirdparty/stb_image"
   ${GLFW_INCLUDE_DIRS}
   ${GLEW_INCLUDE_DIRS}
   ${OPENGL_INCLUDE_DIRS}
   ${GLM_INCLUDE_DIRS}
-  "thirdparty/stb_image"
-  "thirdparty/obj_loader"
-  "thirdparty/catch"
+  ${ASSIMP_INCLUDE_DIR}
+  ${SOIL_INCLUDE_DIRS}
   )
 
 set( EXTRA_LIB ${EXTRA_LIB}
@@ -60,6 +62,8 @@ set( EXTRA_LIB ${EXTRA_LIB}
   ${GLEW_LIBRARIES}
   ${OPENGL_LIBRARIES}
   ${GLM_LIBRARIES}
+  ${ASSIMP_LIBRARY}
+  ${SOIL_LIBRARIES}
   )
 
 add_library ( ${LIB_NAME}
@@ -67,7 +71,7 @@ add_library ( ${LIB_NAME}
   ${SOURCE}
   )
 
-include_directories( src/cpp ${EXTRA_DIRS} )
+include_directories( ${EXTRA_DIRS} )
 target_link_libraries( ${LIB_NAME} ${EXTRA_LIB} )
 add_executable( "${PROJECT_NAME}code" src/cpp/main.cpp )
 add_executable( "${PROJECT_NAME}test" src/cpp/test.cpp )

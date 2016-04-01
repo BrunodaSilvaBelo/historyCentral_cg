@@ -1,38 +1,28 @@
-#ifndef MESH_H
-#define MESH_H
+#ifndef AMESH_H
+#define AMESH_H
 
 #include <GL/glew.h>
-#include <string>
 #include <vector>
+#include "vertex.h"
+#include "texture.h"
 
-class Vertex;
-class IndexedModel;
+class Shader;
 
 class Mesh {
-public:
-  Mesh(std::vector<Vertex> vertices, std::vector<unsigned> indices, bool hasNormal = true);
-  Mesh(const std::string &file);
-  ~Mesh();
-  void draw() const;
+ public:
+  Mesh(const std::vector<Vertex> &vertices, const std::vector<GLuint> &indices,
+       const std::vector<Texture> &textures);
+  void draw(Shader &shader);
 
-  static Mesh getPlainTerrain(unsigned size, float width);
-  static Mesh getHeightTerrain(float width, const std::string &file,
-                               float maxHeight);
-private:
-  enum {
-    POSITION_VB,
-    TEXCOORD_VB,
-    NORMAL_VB,
+  std::vector<Vertex> vertices;
+  std::vector<GLuint> indices;
+  std::vector<Texture> textures;
 
-    INDEX_VB,
-
-    NUM_BUFFERS
-  };
-  GLuint vertexArrayObject;
-  GLuint vertexArrayBuffers[NUM_BUFFERS];
-  GLsizei counter;
-
-  void initMesh(const IndexedModel &model);
+ private:
+  GLuint vao;
+  GLuint vbo;
+  GLuint ebo;
+  void setupMesh();
 };
 
-#endif /* MESH_H */
+#endif /* AMESH_H */

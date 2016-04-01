@@ -70,6 +70,10 @@ void Shader::update(const char *name, const GLint value) {
   glUniform1i(glGetUniformLocation(program, name), value);
 }
 
+void Shader::update(const char *name, const GLuint value) {
+  glUniform1i(glGetUniformLocation(program, name), value);
+}
+
 string loadShader(const string &file) {
   ifstream stream;
   stream.open(file.c_str());

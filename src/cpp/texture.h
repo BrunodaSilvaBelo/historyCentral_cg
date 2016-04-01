@@ -3,20 +3,18 @@
 
 #include <GL/glew.h>
 #include <string>
-#include <vector>
+#include <assimp/scene.h>
 
-class Texture {
+struct Texture {
 public:
   Texture() = default;
-  Texture(const std::string &file);
-  ~Texture();
+  Texture(GLuint id, const std::string &type, const aiString &file);
 
-  void add(const std::string &file);
-  void bind() const;
-
-private:
-  unsigned count = 0;
-  std::vector<GLuint> textures;
+  static const std::string DIFFUSE;
+  static const std::string SPECULAR;
+  GLuint id;
+  std::string type;
+  aiString file;
 };
 
 

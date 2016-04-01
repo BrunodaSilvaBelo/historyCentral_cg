@@ -8,43 +8,34 @@
 #include <GL/glew.h>
 #include <stdio.h>
 #include <exception>
+#include <vector>
+#include <glm/gtx/string_cast.hpp>
 #include "window.h"
 #include "shader.h"
-#include "mesh.h"
-#include "vertex.h"
-#include "texture.h"
 #include "transform.h"
 #include "camera.h"
-#include <vector>
-#include "texturedEntity.h"
-#include <glm/gtx/string_cast.hpp>
 #include "directionalLight.h"
 #include "pointLight.h"
 #include "spotLight.h"
-
+#include "model.h"
+#include <glm/gtx/transform.hpp>
 using namespace std;
 
 int main() {
   try {
     Window::init("OpenGL", 800, 600);
 
-    Mesh mesh("../res/models/esfera.obj");
     Shader shader("../src/glsl/basicShader");
     Camera camera(glm::vec3(0.f, 0.f, 3.f), 70.f, Window::aspect(), 0.1f, 100.f);
-
-    DirectionalLight dLight({0.f,0.f,0.f});
-    dLight.init(shader);
-    PointLight pLight({0.f,0.f,0.f}, 1.f, 0.f, 0.f);
-    pLight.init(shader);
+    Model nano("../res/models/nanosuit/nanosuit.obj");
     Transform transform;
-    TexturedEntity planet(transform, mesh, "../res/textures/planet.png");
-    planet.addTexture("../res/textures/container2_specular.png");
-
+    //transform.applyScale({10.f,10.f,10.f});
     shader.bind();
     shader.update(Shader::PROJECTION, camera.getProjection());
-    shader.update("material.diffuse", 0);
-    shader.update("material.specular", 1);
-    shader.update("material.shininess", 32.f);
+
+    glm::mat4 model;
+    model = glm::translate(model, glm::vec3(0.0f, -1.75f, 0.0f));
+    model = glm::scale(model, glm::vec3(0.2f, 0.2f, 0.2f));
 
     GLfloat counter = 0.f;
     Window::startTimer();
@@ -54,38 +45,9 @@ int main() {
 
       camera.update(Window::deltaTime(), Window::getKey(), Window::getMousePosition()
                     , Window::getMouseButton());
-
-
-      // sol
-      planet.applyScale(glm::vec3(5.f));
-      planet.applyRotation({0.f, counter/0.5f, 0.f});
-      planet.applyTranslate({0.f,0.f,0.f});
-      planet.draw(shader, camera);
-
-      // primeiro planeta
-      planet.applyScale(glm::vec3(0.8f));
-      planet.applyRotation({0.f, -counter * 3, 0.f});
-      planet.applyTranslate({sin(counter) * 10, 0.f, cos(counter) * 10});
-      planet.draw(shader, camera);
-
-      // segundo planeta
-      planet.applyScale(glm::vec3(1.f));
-      planet.applyTranslate({-sin(counter*1.5f) * 20, 0.f, cos(counter*1.5f) * 20});
-      planet.applyRotation({0.f, counter * 5, 0.f});
-
-      // luas
-      planet.draw(shader, camera);
-      planet.applyScale(glm::vec3(0.2f));
-      auto moonPosition = planet.getPosition();
-      planet.applyTranslate(glm::vec3(-sin(counter*3) * 2, 0.f, cos(counter*3) * 2)
-                            + moonPosition);
-      planet.draw(shader, camera);
-      planet.applyTranslate(glm::vec3(sin(counter*10) * 3, cos(counter*10) * 3,
-                                      cos(counter*10) * 3) + moonPosition);
-      planet.draw(shader, camera);
-
-      shader.update("viewPosition", camera.getPosition());
-      pLight.bind(shader);
+      shader.update(Shader::VIEW, camera.getView());
+      shader.update(Shader::MODEL, model);
+      nano.draw(shader);
 
       Window::update();
       counter += 0.01f;
