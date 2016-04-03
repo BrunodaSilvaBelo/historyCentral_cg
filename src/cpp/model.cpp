@@ -13,7 +13,6 @@ GLuint TextureFromFile(const char *file, string directory);
 GLuint TextureFromFile(const char *file, string directory) {
   string fileName = string(file);
   fileName = directory + '/' + fileName;
-
   GLuint textureId;
   glGenTextures(1, &textureId);
   int width, height, numComponent;
@@ -23,7 +22,7 @@ GLuint TextureFromFile(const char *file, string directory) {
     fprintf(stderr, "Texture loading failed for texture: %s\n", fileName.c_str());
 
   glBindTexture(GL_TEXTURE_2D, textureId);
-  glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB,
+  glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA,
                GL_UNSIGNED_BYTE, image);
   glGenerateMipmap(GL_TEXTURE_2D);
 
@@ -43,7 +42,7 @@ Model::Model(const string &file) {
 }
 
 void Model::draw(Shader &shader) {
-  for (auto &it : meshes)
+  for (auto it : meshes)
     it.draw(shader);
 }
 
@@ -64,7 +63,7 @@ void Model::loadModel(const string &file) {
 void Model::processNode(aiNode *node, const aiScene *scene) {
   for (GLuint i = 0; i < node->mNumMeshes; ++i) {
     aiMesh *mesh = scene->mMeshes[node->mMeshes[i]];
-    meshes.push_back(processMesh(mesh, scene));
+    meshes.emplace_back(processMesh(mesh, scene));
   }
 
   for (GLuint i = 0; i < node->mNumChildren; ++i)

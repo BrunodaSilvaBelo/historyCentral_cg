@@ -34,8 +34,8 @@ void Window::init(const string &title, int width, int height) {
 
   glViewport(0,0, dimension.first, dimension.second);
   glEnable(GL_DEPTH_TEST);
-  glEnable(GL_CULL_FACE);
-  glCullFace(GL_BACK);
+  //glEnable(GL_CULL_FACE);
+  //glCullFace(GL_BACK);
 }
 
 GLboolean Window::isClosed() {

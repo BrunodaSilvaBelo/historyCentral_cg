@@ -3,6 +3,7 @@
    @brief
    @author Bruno da Silva Belo
    @bug Luz só funciona se existir uma directional light
+   @bug Directional light parou de funcionar
 */
 
 #include <GL/glew.h>
@@ -18,7 +19,7 @@
 #include "pointLight.h"
 #include "spotLight.h"
 #include "model.h"
-#include <glm/gtx/transform.hpp>
+
 using namespace std;
 
 int main() {
@@ -29,13 +30,15 @@ int main() {
     Camera camera(glm::vec3(0.f, 0.f, 3.f), 70.f, Window::aspect(), 0.1f, 100.f);
     Model nano("../res/models/nanosuit/nanosuit.obj");
     Transform transform;
-    //transform.applyScale({10.f,10.f,10.f});
+    transform.applyScale(glm::vec3(0.2f));
     shader.bind();
     shader.update(Shader::PROJECTION, camera.getProjection());
 
-    glm::mat4 model;
-    model = glm::translate(model, glm::vec3(0.0f, -1.75f, 0.0f));
-    model = glm::scale(model, glm::vec3(0.2f, 0.2f, 0.2f));
+    DirectionalLight dLight({0.f,0.f, -1.f});
+    dLight.init(shader);
+    printf("%s\n", dLight.to_string().c_str());
+    PointLight pLight({0.f,0.f,-2.f});
+    pLight.init(shader);
 
     GLfloat counter = 0.f;
     Window::startTimer();
@@ -45,8 +48,10 @@ int main() {
 
       camera.update(Window::deltaTime(), Window::getKey(), Window::getMousePosition()
                     , Window::getMouseButton());
+      shader.bind();
+      pLight.bind(shader);
       shader.update(Shader::VIEW, camera.getView());
-      shader.update(Shader::MODEL, model);
+      shader.update(Shader::MODEL, transform.getModel());
       nano.draw(shader);
 
       Window::update();

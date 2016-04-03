@@ -1,5 +1,5 @@
-#ifndef AMESH_H
-#define AMESH_H
+#ifndef MESH_H
+#define MESH_H
 
 #include <GL/glew.h>
 #include <vector>
@@ -12,6 +12,7 @@ class Mesh {
  public:
   Mesh(const std::vector<Vertex> &vertices, const std::vector<GLuint> &indices,
        const std::vector<Texture> &textures);
+  ~Mesh();
   void draw(Shader &shader);
 
   std::vector<Vertex> vertices;
@@ -25,4 +26,4 @@ class Mesh {
   void setupMesh();
 };
 
-#endif /* AMESH_H */
+#endif /* MESH_H */
