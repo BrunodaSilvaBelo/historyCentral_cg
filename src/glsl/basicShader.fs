@@ -59,7 +59,8 @@ vec3 calcPointLight(PointLight light, vec3 normal);
 vec3 calcSpotLight(SpotLight light, vec3 normal);
 
 vec3 calcBaseLight(BaseLight light, vec3 lightDirection, vec3 normal) {
-  vec3 ambient = light.ambient * vec3(texture(material.texture_diffuse1, texCoord0));
+  vec3 ambient = light.ambient * vec3(texture(material.texture_diffuse1,
+                                              texCoord0));
   vec3 diffuse = vec3(0.f);
   vec3 specular = vec3(0.f);
 
@@ -115,15 +116,15 @@ vec3 calcSpotLight(SpotLight light, vec3 normal) {
 void main() {
   vec3 normal = normalize(normal0);
 
-  vec3 result = vec3(0.f,0.f,0.f);
+  vec3 result = vec3(0.f);
 
-  result = calcDirectionalLight(directionalLight, normal);
+  result += calcDirectionalLight(directionalLight, normal);
 
   for (int i = 0; i < numPointLight; ++i)
-    //result += calcPointLight(pointLight[i], normal);
+    result += calcPointLight(pointLight[i], normal);
 
   if (spotLight.isOn)
-    //result += calcSpotLight(spotLight, normal);
+    result += calcSpotLight(spotLight, normal);
 
   color = vec4(result, 1.f);
 }

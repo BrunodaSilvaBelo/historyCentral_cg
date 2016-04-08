@@ -7,7 +7,6 @@ find_package( OpenGL REQUIRED )
 find_package( GLM REQUIRED )
 find_package( PkgConfig REQUIRED )
 find_package( Assimp REQUIRED )
-find_package( SOIL REQUIRED )
 pkg_search_module( GLFW REQUIRED glfw3 )
 
 if ( ${CMAKE_CXX_COMPILER_ID} STREQUAL "GNU" OR ${CMAKE_CXX_COMPILER_ID} STREQUAL "Clang" )
