@@ -2,8 +2,8 @@
 
 #define INVERSION 0
 #define GRAYSCALE 0
-#define KERNEL 1
-#define EDGEDETECTION
+#define KERNEL 0
+#define EDGE
 
 in vec2 texCoord0;
 
@@ -50,10 +50,10 @@ void main() {
                              1.f/9.f,1.f/9.f,1.f/9.f,
                              1.f/9.f,1.f/9.f,1.f/9.f
 #endif
-#ifdef EDGEDETECTION
-                             -1.f,-1.f,-1.f,
-                             -1.f,8.f,-1.f,
-                             -1.f,-1.f,-1.f
+#ifdef EDGE
+                             1.f,1.f,1.f,
+                             1.f,-7.f,1.f,
+                             1.f,1.f,1.f
 #endif
 #ifdef EMBOSS
                              -2.f,-1.f,0,
@@ -81,9 +81,14 @@ void main() {
                              1.f,2.f,1.f
 #endif
 #ifdef IDENTITY
-                             0,0,0,
-                             0,1.f,0,
-                             0,0,0
+                             2.f,2.f,2.f,
+                             2.f,-15.f,2.f,
+                             2.f,2.f,2.f
+#endif
+#ifdef CUSTOM
+                             1.f,1.f,1.f,
+                             1.f,-7.f,1.f,
+                             1.f,1.f,1.f
 #endif
                              );
   vec3 sampleTex[9];

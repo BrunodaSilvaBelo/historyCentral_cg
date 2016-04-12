@@ -18,6 +18,7 @@ void Window::init(const string &title, int width, int height) {
   glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
   glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
   glfwWindowHint(GLFW_RESIZABLE, GL_FALSE);
+  glfwWindowHint(GLFW_SAMPLES, 4);
 
   dimension = {width, height};
   window.reset(glfwCreateWindow(dimension.first, dimension.second, title.c_str(), nullptr, nullptr));
@@ -32,8 +33,7 @@ void Window::init(const string &title, int width, int height) {
     throw new runtime_error("GLEW failed to initialize!");
 
   glViewport(0,0, dimension.first, dimension.second);
-  //glEnable(GL_DEPTH_TEST);
-  //glDepthFunc(GL_LESS);
+  glEnable(GL_MULTISAMPLE);
 }
 
 GLboolean Window::isClosed() {

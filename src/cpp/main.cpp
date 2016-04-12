@@ -119,7 +119,7 @@ int main() {
 
       auto view = camera.getView();
 
-      glBindFramebuffer(GL_FRAMEBUFFER, fb.fbo);
+      glBindFramebuffer(GL_FRAMEBUFFER, fb.getFBO(true));
       glEnable(GL_DEPTH_TEST);
       Window::clear();
 
@@ -143,6 +143,10 @@ int main() {
       shader.update(Shader::MODEL, transform.getModel());
       door.draw(shader);
 
+      glBindFramebuffer(GL_READ_FRAMEBUFFER, fb.getFBO(true));
+      glBindFramebuffer(GL_DRAW_FRAMEBUFFER, fb.getFBO(false));
+      glBlitFramebuffer(0, 0, 800, 600, 0, 0, 800, 600, GL_COLOR_BUFFER_BIT, GL_NEAREST);
+
       glBindFramebuffer(GL_FRAMEBUFFER, 0);
       glClearColor(1.f, 1.f, 1.f, 1.f);
       glClear(GL_COLOR_BUFFER_BIT);
@@ -150,9 +154,10 @@ int main() {
       screen.bind();
       glBindVertexArray(quadVAO);
       glDisable(GL_DEPTH_TEST);
-      glBindTexture(GL_TEXTURE_2D, fb.buffer);	// Use the color attachment texture as the texture of the quad plane
+      glBindTexture(GL_TEXTURE_2D, fb.getTexture(false));	// Use the color attachment texture as the texture of the quad plane
       glDrawArrays(GL_TRIANGLES, 0, 6);
       glBindVertexArray(0);
+
       Window::update();
       counter += 0.01f;
     }
