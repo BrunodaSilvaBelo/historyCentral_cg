@@ -25,7 +25,6 @@ void Window::init(const string &title, int width, int height) {
     throw new runtime_error("GLFW window failed to be created!");
 
   glfwMakeContextCurrent(window.get());
-  //glfwSetInputMode(window.get(), GLFW_STICKY_KEYS, 1);
   glfwSetInputMode(window.get(), GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
   glewExperimental = GL_TRUE;
@@ -33,9 +32,8 @@ void Window::init(const string &title, int width, int height) {
     throw new runtime_error("GLEW failed to initialize!");
 
   glViewport(0,0, dimension.first, dimension.second);
-  glEnable(GL_DEPTH_TEST);
-  //glEnable(GL_CULL_FACE);
-  //glCullFace(GL_BACK);
+  //glEnable(GL_DEPTH_TEST);
+  //glDepthFunc(GL_LESS);
 }
 
 GLboolean Window::isClosed() {

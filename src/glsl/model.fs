@@ -53,27 +53,34 @@ uniform int numPointLight;
 uniform PointLight pointLight[10];
 uniform SpotLight spotLight;
 
+const float near = 1.f;
+const float far = 100.f;
+
 vec3 calcBaseLight(BaseLight light, vec3 lightDirection, vec3 normal);
 vec3 calcDirectionalLight(DirectionalLight light, vec3 normal);
 vec3 calcPointLight(PointLight light, vec3 normal);
 vec3 calcSpotLight(SpotLight light, vec3 normal);
+float linearizeDepth(float depth);
 
 vec3 calcBaseLight(BaseLight light, vec3 lightDirection, vec3 normal) {
-  vec3 ambient = light.ambient * vec3(0.5f,0.f,0.f);
+  vec3 ambient = light.ambient *
+    vec3(texture(material.texture_diffuse1, texCoord0));
+
   vec3 diffuse = vec3(0.f);
   vec3 specular = vec3(0.f);
 
   float diff = dot(normal, -lightDirection);
   if (diff > 0) {
     diffuse = diff * (light.diffuse
-                      * vec3(0.5f,0.f,0.f));
+                      * vec3(texture(material.texture_diffuse1, texCoord0)));
+
     vec3 viewDirection = normalize(viewPosition - fragPosition);
     vec3 reflectDirection = normalize(reflect(lightDirection, normal));
     float spec = dot(viewDirection, reflectDirection);
     if (spec > 0) {
       spec = pow(spec, material.shininess);
       specular = spec * (light.specular
-                         * vec3(1.f,1.f,1.f));
+                         * vec3(texture(material.texture_specular1, texCoord0)));
     }
   }
 
@@ -111,18 +118,22 @@ vec3 calcSpotLight(SpotLight light, vec3 normal) {
   return intensity * result;
 }
 
+float linearizeDepth(float depth) {
+  float z = depth * 2.f - 1.f;
+  return (2.f * near * far) / (far + near - z * (far - near));
+}
+
 void main() {
   vec3 normal = normalize(normal0);
 
   vec3 result = vec3(0.f);
-
-  result = calcDirectionalLight(directionalLight, normal);
+  result += calcDirectionalLight(directionalLight, normal);
 
   for (int i = 0; i < numPointLight; ++i)
     result += calcPointLight(pointLight[i], normal);
 
   if (spotLight.isOn)
-    //result += calcSpotLight(spotLight, normal);
+    result += calcSpotLight(spotLight, normal);
 
   color = vec4(result, 1.f);
 }
