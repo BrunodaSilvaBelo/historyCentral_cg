@@ -52,6 +52,7 @@ uniform DirectionalLight directionalLight;
 uniform int numPointLight;
 uniform PointLight pointLight[10];
 uniform SpotLight spotLight;
+uniform samplerCube skybox;
 
 const float near = 1.f;
 const float far = 100.f;

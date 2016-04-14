@@ -2,8 +2,9 @@
 
 #define INVERSION 0
 #define GRAYSCALE 0
+#define SEPIA 0
 #define KERNEL 0
-#define EDGE
+#define SHARPEN
 
 in vec2 texCoord0;
 
@@ -19,6 +20,13 @@ void main() {
 #if GRAYSCALE
   float average = 0.2126f * color.r + 0.7152f * color.g + 0.0722f * color.b;
   color = vec4(vec3(average), 1.f);
+#endif
+#if SEPIA
+  vec4 outcolor = color;
+  outcolor.r = (color.r * 0.393f) + (color.g * 0.769f) + (color.b * 0.189f);
+  outcolor.g = (color.r * 0.349f) + (color.g * 0.686f) + (color.b * 0.168f);
+  outcolor.b = (color.r * 0.272f) + (color.g * 0.534f) + (color.b * 0.131f);
+  color = outcolor;
 #endif
 #if KERNEL
   const float offset = 1.f/300.f;
@@ -81,13 +89,13 @@ void main() {
                              1.f,2.f,1.f
 #endif
 #ifdef IDENTITY
-                             2.f,2.f,2.f,
-                             2.f,-15.f,2.f,
-                             2.f,2.f,2.f
+                             0,0,0,
+                             0,1.f,0,
+                             0,0,0
 #endif
 #ifdef CUSTOM
                              1.f,1.f,1.f,
-                             1.f,-7.f,1.f,
+                             1.f,-8.f,1.f,
                              1.f,1.f,1.f
 #endif
                              );

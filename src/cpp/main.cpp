@@ -20,10 +20,15 @@
 #include "spotLight.h"
 #include "model.h"
 #include "framebuffer.h"
+#include "skybox.h"
+#include "stb_image.h"
+
+#define MSAA 1
 
 using namespace std;
 
 void automaticDoor(Transform &transform, const Camera &camera);
+GLuint loadCubemap(vector<const GLchar*> faces);
 
 void automaticDoor(Transform &transform, const Camera &camera) {
   static float rotate = 0.f;
@@ -39,21 +44,50 @@ void automaticDoor(Transform &transform, const Camera &camera) {
   transform.applyRotation({0.f, rotate, 0.f});
 }
 
+GLuint loadCubemap(vector<const GLchar*> faces)
+{
+    GLuint textureID;
+    glGenTextures(1, &textureID);
+
+    int width,height, numComponents;
+    unsigned char* image;
+
+    glBindTexture(GL_TEXTURE_CUBE_MAP, textureID);
+    for(GLuint i = 0; i < faces.size(); i++)
+    {
+        image = stbi_load(faces[i], &width, &height, &numComponents, 3);
+        glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, image);
+        stbi_image_free(image);
+    }
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+    glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
+
+    return textureID;
+}
+
 int main() {
   try {
     Window::init("OpenGL", 800, 600);
 
-    Shader shader("../src/glsl/model");
-    Shader screen("../src/glsl/postprocessing");
+    Shader modelShader("../src/glsl/model");
+    Shader screenShader("../src/glsl/postprocessing");
+    Shader skyShader("../src/glsl/skybox");
 
     Camera camera(glm::vec3(0.f, 0.f, 3.f), 70.f, Window::aspect(), 0.1f, 100.f);
     auto projection = camera.getProjection();
+    skyShader.bind();
+    skyShader.update(Shader::PROJECTION, projection);
+    modelShader.bind();
+    modelShader.update(Shader::PROJECTION, projection);
+
     Transform transform;
-    shader.bind();
-    shader.update(Shader::PROJECTION, projection);
 
     DirectionalLight dLight({0.f,0.f, 1.f});
-    dLight.init(shader);
+    dLight.init(modelShader);
 
     vector<glm::vec3> lightPositions = {
       {0.f,0.f,-2.f},
@@ -65,7 +99,7 @@ int main() {
     vector<PointLight> pLights;
     for (unsigned i = 0; i < lightPositions.size(); ++i) {
       pLights.emplace_back(lightPositions[i]);
-      pLights[i].init(shader);
+      pLights[i].init(modelShader);
     }
 
     GLfloat counter = 0.f;
@@ -87,7 +121,7 @@ int main() {
 
     Model door("../res/models/church/door.obj");
 
-    GLfloat quadVertices[] = {   // Vertex attributes for a quad that fills the entire screen in Normalized Device Coordinates.
+    GLfloat quadVertices[] = {   // Vertex attributes for a quad that fills the entire screenShader in Normalized Device Coordinates.
       // Positions   // TexCoords
       -1.0f,  1.0f,  0.0f, 1.0f,
       -1.0f, -1.0f,  0.0f, 0.0f,
@@ -109,8 +143,12 @@ int main() {
     glEnableVertexAttribArray(1);
     glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(GLfloat), (GLvoid*)(2 * sizeof(GLfloat)));
     glBindVertexArray(0);
-
+#if MSAA
+    glfwWindowHint(GLFW_SAMPLES, 4);
+    glEnable(GL_MULTISAMPLE);
     FrameBuffer fb;
+#endif
+    Skybox sky("../res/textures/skybox/");
     Window::startTimer();
     while (!Window::isClosed()) {
       glfwPollEvents();
@@ -119,44 +157,52 @@ int main() {
 
       auto view = camera.getView();
 
-      glBindFramebuffer(GL_FRAMEBUFFER, fb.getFBO(true));
+#if MSAA
+      glBindFramebuffer(GL_FRAMEBUFFER, fb.getFBO(GL_TRUE));
       glEnable(GL_DEPTH_TEST);
+#endif
+
       Window::clear();
+      skyShader.bind();
+      auto skyview = glm::mat4(glm::mat3(view));
+      skyShader.update(Shader::VIEW, skyview);
+      skyShader.update("skybox", 0);
+      sky.draw();
 
-      shader.bind();
+      modelShader.bind();
       for (auto it : pLights)
-        it.bind(shader);
+        it.bind(modelShader);
 
-      shader.update(Shader::VIEW, view);
+      modelShader.update(Shader::VIEW, view);
 
       for (unsigned i = 0; i < models.size(); ++i) {
         transform.applyTranslate(positions[i]);
         transform.applyRotation({0.f,0.f,0.f});
         transform.applyScale(scales[i]);
-        shader.update(Shader::MODEL, transform.getModel());
-        models[i].draw(shader);
+        modelShader.update(Shader::MODEL, transform.getModel());
+        models[i].draw(modelShader);
       }
 
       transform.applyTranslate(churchPosition + glm::vec3(-0.27f,-2.34f, 1.1f));
       transform.applyScale(glm::vec3(1.f));
       automaticDoor(transform, camera);
-      shader.update(Shader::MODEL, transform.getModel());
-      door.draw(shader);
+      modelShader.update(Shader::MODEL, transform.getModel());
+      door.draw(modelShader);
 
-      glBindFramebuffer(GL_READ_FRAMEBUFFER, fb.getFBO(true));
-      glBindFramebuffer(GL_DRAW_FRAMEBUFFER, fb.getFBO(false));
+#if MSAA
+      glBindFramebuffer(GL_READ_FRAMEBUFFER, fb.getFBO(GL_TRUE));
+      glBindFramebuffer(GL_DRAW_FRAMEBUFFER, fb.getFBO(GL_FALSE));
       glBlitFramebuffer(0, 0, 800, 600, 0, 0, 800, 600, GL_COLOR_BUFFER_BIT, GL_NEAREST);
 
       glBindFramebuffer(GL_FRAMEBUFFER, 0);
-      glClearColor(1.f, 1.f, 1.f, 1.f);
-      glClear(GL_COLOR_BUFFER_BIT);
-
-      screen.bind();
+      screenShader.bind();
       glBindVertexArray(quadVAO);
       glDisable(GL_DEPTH_TEST);
-      glBindTexture(GL_TEXTURE_2D, fb.getTexture(false));	// Use the color attachment texture as the texture of the quad plane
+      glBindTexture(GL_TEXTURE_2D, fb.getTexture(GL_FALSE));	// Use the color attachment texture as the texture of the quad plane
       glDrawArrays(GL_TRIANGLES, 0, 6);
       glBindVertexArray(0);
+#endif
+
 
       Window::update();
       counter += 0.01f;
