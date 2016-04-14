@@ -40,9 +40,11 @@ struct SpotLight {
   PointLight base;
 };
 
-in vec3 normal0;
-in vec3 fragPosition;
-in vec2 texCoord0;
+in VS_OUT {
+ vec2 texCoord;
+ vec3 fragPosition;
+ vec3 normal;
+} fs_in;
 
 out vec4 color;
 
@@ -65,7 +67,7 @@ float linearizeDepth(float depth);
 
 vec3 calcBaseLight(BaseLight light, vec3 lightDirection, vec3 normal) {
   vec3 ambient = light.ambient *
-    vec3(texture(material.texture_diffuse1, texCoord0));
+    vec3(texture(material.texture_diffuse1, fs_in.texCoord));
 
   vec3 diffuse = vec3(0.f);
   vec3 specular = vec3(0.f);
@@ -73,15 +75,15 @@ vec3 calcBaseLight(BaseLight light, vec3 lightDirection, vec3 normal) {
   float diff = dot(normal, -lightDirection);
   if (diff > 0) {
     diffuse = diff * (light.diffuse
-                      * vec3(texture(material.texture_diffuse1, texCoord0)));
+                      * vec3(texture(material.texture_diffuse1, fs_in.texCoord)));
 
-    vec3 viewDirection = normalize(viewPosition - fragPosition);
+    vec3 viewDirection = normalize(viewPosition - fs_in.fragPosition);
     vec3 reflectDirection = normalize(reflect(lightDirection, normal));
     float spec = dot(viewDirection, reflectDirection);
     if (spec > 0) {
       spec = pow(spec, material.shininess);
       specular = spec * (light.specular
-                         * vec3(texture(material.texture_specular1, texCoord0)));
+                         * vec3(texture(material.texture_specular1, fs_in.texCoord)));
     }
   }
 
@@ -93,7 +95,7 @@ vec3 calcDirectionalLight(DirectionalLight light, vec3 normal) {
 }
 
 vec3 calcPointLight(PointLight light, vec3 normal) {
-  vec3 lightDirection = fragPosition - light.position;
+  vec3 lightDirection = fs_in.fragPosition - light.position;
   float dist = length(lightDirection);
   lightDirection = normalize(lightDirection);
 
@@ -106,7 +108,7 @@ vec3 calcPointLight(PointLight light, vec3 normal) {
 }
 
 vec3 calcSpotLight(SpotLight light, vec3 normal) {
-  vec3 lightDirection = normalize(fragPosition - light.base.position);
+  vec3 lightDirection = normalize(fs_in.fragPosition - light.base.position);
   float theta = dot(lightDirection, light.direction);
 
   if (theta < light.cutOff)
@@ -125,7 +127,7 @@ float linearizeDepth(float depth) {
 }
 
 void main() {
-  vec3 normal = normalize(normal0);
+  vec3 normal = normalize(fs_in.normal);
 
   vec3 result = vec3(0.f);
   result += calcDirectionalLight(directionalLight, normal);

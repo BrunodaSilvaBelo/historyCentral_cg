@@ -43,6 +43,7 @@ set( SOURCE ${SOURCE}
   "${PROJECT_SOURCE_DIR}/src/cpp/attenuation.cpp"
   "${PROJECT_SOURCE_DIR}/src/cpp/skybox.cpp"
   "${PROJECT_SOURCE_DIR}/src/cpp/framebuffer.cpp"
+  "${PROJECT_SOURCE_DIR}/src/cpp/uniformbuffer.cpp"
   "${PROJECT_SOURCE_DIR}/thirdparty/stb_image/stb_image.c"
   )
 

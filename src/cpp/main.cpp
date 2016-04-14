@@ -21,14 +21,13 @@
 #include "model.h"
 #include "framebuffer.h"
 #include "skybox.h"
-#include "stb_image.h"
+#include "uniformbuffer.h"
 
 #define MSAA 1
 
 using namespace std;
 
 void automaticDoor(Transform &transform, const Camera &camera);
-GLuint loadCubemap(vector<const GLchar*> faces);
 
 void automaticDoor(Transform &transform, const Camera &camera) {
   static float rotate = 0.f;
@@ -44,46 +43,20 @@ void automaticDoor(Transform &transform, const Camera &camera) {
   transform.applyRotation({0.f, rotate, 0.f});
 }
 
-GLuint loadCubemap(vector<const GLchar*> faces)
-{
-    GLuint textureID;
-    glGenTextures(1, &textureID);
-
-    int width,height, numComponents;
-    unsigned char* image;
-
-    glBindTexture(GL_TEXTURE_CUBE_MAP, textureID);
-    for(GLuint i = 0; i < faces.size(); i++)
-    {
-        image = stbi_load(faces[i], &width, &height, &numComponents, 3);
-        glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, image);
-        stbi_image_free(image);
-    }
-    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
-    glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
-
-    return textureID;
-}
-
 int main() {
   try {
     Window::init("OpenGL", 800, 600);
 
+    UniformBuffer ub;
+
     Shader modelShader("../src/glsl/model");
+    modelShader.setUniform("Matrices", 0);
     Shader screenShader("../src/glsl/postprocessing");
     Shader skyShader("../src/glsl/skybox");
+    skyShader.setUniform("Matrices", 0);
 
     Camera camera(glm::vec3(0.f, 0.f, 3.f), 70.f, Window::aspect(), 0.1f, 100.f);
-    auto projection = camera.getProjection();
-    skyShader.bind();
-    skyShader.update(Shader::PROJECTION, projection);
-    modelShader.bind();
-    modelShader.update(Shader::PROJECTION, projection);
-
+    ub.setProjection(camera.getProjection());
     Transform transform;
 
     DirectionalLight dLight({0.f,0.f, 1.f});
@@ -155,7 +128,7 @@ int main() {
       camera.update(Window::deltaTime(), Window::getKey(), Window::getMousePosition()
                     , Window::getMouseButton());
 
-      auto view = camera.getView();
+      ub.updateView(camera.getView());
 
 #if MSAA
       glBindFramebuffer(GL_FRAMEBUFFER, fb.getFBO(GL_TRUE));
@@ -164,16 +137,14 @@ int main() {
 
       Window::clear();
       skyShader.bind();
-      auto skyview = glm::mat4(glm::mat3(view));
-      skyShader.update(Shader::VIEW, skyview);
       skyShader.update("skybox", 0);
+      auto view = glm::mat4(glm::mat3(camera.getView()));
+      skyShader.update("skyview", view);
       sky.draw();
 
       modelShader.bind();
       for (auto it : pLights)
         it.bind(modelShader);
-
-      modelShader.update(Shader::VIEW, view);
 
       for (unsigned i = 0; i < models.size(); ++i) {
         transform.applyTranslate(positions[i]);

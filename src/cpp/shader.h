@@ -21,6 +21,7 @@ public:
   void update(const char *name, const GLfloat value);
   void update(const char *name, const GLint value);
   void update(const char *name, const GLuint value);
+  void setUniform(const char *name, const GLuint value);
 private:
   static const unsigned int NUM_SHADERS = 2;
   GLuint program;
