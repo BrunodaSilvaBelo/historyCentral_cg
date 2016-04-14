@@ -91,7 +91,7 @@ Skybox::Skybox(const string &path) {
     (path + "right.jpg").c_str(),
     (path + "left.jpg").c_str(),
     (path + "top.jpg").c_str(),
-    (path + "bottom.jgp").c_str(),
+    (path + "bottom.jpg").c_str(),
     (path + "back.jpg").c_str(),
     (path + "front.jpg").c_str()
   };

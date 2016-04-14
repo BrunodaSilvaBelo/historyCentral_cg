@@ -138,8 +138,6 @@ int main() {
       Window::clear();
       skyShader.bind();
       skyShader.update("skybox", 0);
-      auto view = glm::mat4(glm::mat3(camera.getView()));
-      skyShader.update("skyview", view);
       sky.draw();
 
       modelShader.bind();
