@@ -13,13 +13,16 @@ out VS_OUT {
   vec2 texCoord;
   vec3 fragPosition;
   vec3 normal;
+  vec4 lightSpacePos;
 } vs_out;
 
 uniform mat4 model;
+uniform mat4 lightSpaceMatrix;
 
 void main() {
   gl_Position = projection * view * model * vec4(position, 1.f);
   vs_out.fragPosition = vec3(model * vec4(position, 1.f));
   vs_out.normal = mat3(transpose(inverse(model))) * normal;
   vs_out.texCoord = texCoord;
+  vs_out.lightSpacePos = lightSpaceMatrix * vec4(position, 1.f);
 }

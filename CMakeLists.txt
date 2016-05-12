@@ -45,6 +45,8 @@ set( SOURCE ${SOURCE}
   "${PROJECT_SOURCE_DIR}/src/cpp/framebuffer.cpp"
   "${PROJECT_SOURCE_DIR}/src/cpp/uniformbuffer.cpp"
   "${PROJECT_SOURCE_DIR}/thirdparty/stb_image/stb_image.c"
+  "${PROJECT_SOURCE_DIR}/src/cpp/render.cpp"
+  "${PROJECT_SOURCE_DIR}/src/cpp/normal.cpp"
   )
 
 set ( EXTRA_DIRS ${EXTRA_DIRS}

@@ -21,6 +21,7 @@ public:
   static std::function<int(int)> getKey();
   static std::function<void(double*,double*)> getMousePosition();
   static std::function<int(int)> getMouseButton();
+  static void resize();
 
 private:
   static constexpr GLint FPS = 1000 / 60;

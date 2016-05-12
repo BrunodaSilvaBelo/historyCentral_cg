@@ -4,7 +4,7 @@
 #define GRAYSCALE 0
 #define SEPIA 0
 #define KERNEL 0
-#define SHARPEN
+#define BLUR
 
 in vec2 texCoord0;
 
@@ -94,9 +94,9 @@ void main() {
                              0,0,0
 #endif
 #ifdef CUSTOM
-                             1.f,1.f,1.f,
-                             1.f,-8.f,1.f,
-                             1.f,1.f,1.f
+                             0.f,1.f,0.f,
+                             1.f,-5.f,1.f,
+                             0.f,1.f,0.f
 #endif
                              );
   vec3 sampleTex[9];

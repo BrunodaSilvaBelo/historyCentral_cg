@@ -33,6 +33,8 @@ void Window::init(const string &title, int width, int height) {
 
   glViewport(0,0, dimension.first, dimension.second);
   glEnable(GL_DEPTH_TEST);
+  glEnable(GL_CULL_FACE);
+  glEnable(GL_BACK);
 }
 
 GLboolean Window::isClosed() {
@@ -83,4 +85,8 @@ function<void(double*,double*)> Window::getMousePosition() {
 function<int(int)> Window::getMouseButton() {
   GLFWwindow *win = window.get();
   return [win](int button){return glfwGetMouseButton(win, button);};
+}
+
+void Window::resize() {
+  glViewport(0, 0, dimension.first, dimension.second);
 }
